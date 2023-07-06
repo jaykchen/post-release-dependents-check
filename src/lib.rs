@@ -24,6 +24,8 @@ pub async fn run() {
 
 async fn handler(payload: EventPayload) {
     let octocrab = get_octo(&GithubLogin::Default);
+    // // repos to watch
+    // // vec of (owner, repo, workflow_id, branch)
     // let owner_repo_workflow_id_branch_vec = vec![
     //     ("second-state", "microservice-rust-mysql", "ci.yml", "main"),
     //     ("second-state", "wasmedge-quickjs", "examples.yml", "main"),
