@@ -9,6 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1.0.71"
+dotenv = "0.15.0"
 flowsnet-platform-sdk = "0.1.4"
 github-flows = "0.5.1"
 serde = "1.0.166"

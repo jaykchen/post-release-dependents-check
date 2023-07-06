@@ -3,17 +3,19 @@ use github_flows::{
     get_octo, listen_to_event, octocrab::models::events::payload::WorkflowRunEventAction,
     EventPayload, GithubLogin,
 };
-
+use dotenv::dotenv;
+use std::env;
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 pub async fn run() {
-    let owner = "jaykchen";
-    let repo = "chatgpt-private-test";
+    dotenv().ok();
+    let github_owner = env::var("github_owner").unwrap_or("jaykchen".to_string());
+    let github_repo = env::var("github_repo").unwrap_or("chatgpt-private-test".to_string());
 
     listen_to_event(
         &GithubLogin::Default,
-        &owner,
-        &repo,
+        &github_owner,
+        &github_repo,
         vec!["workflow_run"],
         handler,
     )
@@ -22,13 +24,13 @@ pub async fn run() {
 
 async fn handler(payload: EventPayload) {
     let octocrab = get_octo(&GithubLogin::Default);
-    // let owner_repo_workflow_id_branch_obj = vec![
+    // let owner_repo_workflow_id_branch_vec = vec![
     //     ("second-state", "microservice-rust-mysql", "ci.yml", "main"),
     //     ("second-state", "wasmedge-quickjs", "examples.yml", "main"),
     // ];
 
     // https://github.com/jaykchen/hacker-news-lambda/blob/main/.github/workflows/placeholder.yml
-    let owner_repo_workflow_id_branch_obj =
+    let owner_repo_workflow_id_branch_vec =
         vec![("jaykchen", "hacker-news-lambda", "placeholder.yml", "main")];
 
     let _success = "success".to_string();
@@ -41,14 +43,13 @@ async fn handler(payload: EventPayload) {
                         // https://github.com/second-state/microservice-rust-mysql/blob/main/.github/workflows/ci.yml
                         // https://github.com/second-state/wasmedge-quickjs/blob/main/.github/workflows/examples.yml
 
-                        for (owner, repo, workflow_id, branch) in owner_repo_workflow_id_branch_obj
+                        for (owner, repo, workflow_id, branch) in owner_repo_workflow_id_branch_vec
                         {
                             let _ = octocrab
                                 .actions()
                                 .create_workflow_dispatch(owner, repo, workflow_id, branch)
-                                .inputs(serde_json::json!({ "inputs": {
-                                    "logLevel": "info"
-                                }}))
+                                .inputs(serde_json::json!({ 
+                                    "logLevel": "info"}))
                                 .send()
                                 .await;
                         }
